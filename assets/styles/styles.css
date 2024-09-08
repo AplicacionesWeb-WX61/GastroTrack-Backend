@@ -1,0 +1,196 @@
+body {
+    font-family: Nunito, sans-serif;
+    margin: 0;
+    padding: 0;
+    
+}
+
+.navbar {
+    display:flex;
+    width: 100%;
+    height: 90px;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+
+    >div {
+        margin-right: 10px;
+    }
+    > div button{
+      background-color: #66A18A;
+      color: white;
+      border: none;
+      padding: 10px;
+      font-size: 12;
+      font-weight: 500; /*Medium*/
+      border-radius: 4px;
+    }
+    
+}
+.navbar ul {
+    display: flex;
+    list-style-type: none;
+    gap: 10px;
+    align-items: flex-end;
+    margin-left: auto;
+}
+.navbar img {
+    margin-left: 10px;
+    max-width: 100%;
+    height: 70px;
+}
+
+.navbar ul li {
+    padding: 8px;   
+}
+
+.navbar a {
+    display: block;
+    color: black;
+    text-decoration: none;
+    padding-right: 8px;
+    font-size: 15px;
+    font-weight: 500; /*Medium*/
+
+ 
+}
+.navbar ul li:hover {
+    background-color: #d1d1d1;
+    
+}
+
+.hero {
+    background-image: url("https://github.com/FoodOs-Upc/FoodOs-LandingPage/blob/main/assets/img/haccp-101_1657038906%201.png?raw=true");
+    background-size: cover; 
+    width: 100%;
+    height: 920px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end ;
+    >p{
+        color: white;
+        font-size: 80px;
+        margin-right: 70px;
+    }
+    
+}
+
+.btn-star{
+    background-color:#ebb755;
+    height:69px;
+    width:221px;
+    font-size: 30px;
+    color: white;
+    border-radius:16px;
+    filter:drop-shadow(0px 4px 4px rgba(0,0,0,0.25));
+}
+
+.section-title {
+    font-size: 50px;
+    margin-bottom: 30px;
+    color:#66A18A;
+  }
+
+  #service {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    
+  }
+  .row {
+    
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .column1, .column2, .column3 {
+    background-color: #66A18A;
+    padding: 30px;
+    margin: 10px;
+    flex: 1;
+    border-radius:8px;
+    p > {
+        font-size: 18px;}
+  }
+
+  .service-img {
+    width: 180px;
+    height: auto;
+    
+  }
+
+  /*Membership*/
+
+  #membership{
+    text-align: center;
+    padding: 50px;
+  }
+  
+  .plan-cards {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  
+  .plan-card {
+    background-color: #66A18A;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    margin-bottom: 30px;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .plan-card h2 {
+    margin-top: 0;
+  }
+  
+  .plan-card p {
+    margin-bottom: 20px;
+  }
+  
+  .plan-card button {
+    background-color: #EBB755;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  #video-about-product{
+    padding: 10px;
+    text-align: center;
+  }
+
+  #video-about-team{
+    padding: 10px;
+    text-align: center;
+  }
+
+  /*Footer*/
+
+  .footer{
+    background-color: #66A18A;
+    color: #fff; 
+    text-align: center; 
+    padding: 10px; 
+    display: flex;
+    flex-direction: row;
+      >img{
+        width: auto;
+        height: 120px;
+      }
+  }
+  .img-contact{
+    display: flex; 
+    align-items: center;
+  }
