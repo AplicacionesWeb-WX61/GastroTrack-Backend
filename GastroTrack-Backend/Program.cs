@@ -57,7 +57,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         _ => throw new Exception("Unknown environment")
     };
 
-    if (connectionString == null)
+    if (string.IsNullOrEmpty(connectionString))
         throw new Exception("No connection string found");
 
     options
@@ -178,17 +178,27 @@ app.Run();
 string GetFormattedConnectionString()
 {
     var connectionStringTemplate = builder.Configuration.GetConnectionString("DefaultConnection");
-    if (connectionStringTemplate == null)
+    if (string.IsNullOrEmpty(connectionStringTemplate))
         throw new Exception("No connection string template found");
 
     string? host = Env.GetString("MYSQL_HOST");
     string? user = Env.GetString("MYSQL_USER");
     string? password = Env.GetString("MYSQL_PASSWORD");
     string? database = Env.GetString("MYSQL_DATABASE");
-    string? port = Env.GetString("MYSQL_PORT");
+    string? portStr = Env.GetString("MYSQL_PORT");
 
-    if (host == null || user == null || password == null || database == null || port == null)
+    if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(database) || string.IsNullOrEmpty(portStr))
         throw new Exception("Environment variables for MySQL are missing");
 
-    return string.Format(connectionStringTemplate, host, port, user, password, database);
+    if (!int.TryParse(portStr, out int port))
+        throw new Exception("MYSQL_PORT should be a valid number");
+
+    // Debug output for verification
+    Console.WriteLine($"Host: {host}");
+    Console.WriteLine($"User: {user}");
+    Console.WriteLine($"Password: {password}");
+    Console.WriteLine($"Database: {database}");
+    Console.WriteLine($"Port: {port}");
+
+    return string.Format(connectionStringTemplate, host, user, password, database, port);
 }
