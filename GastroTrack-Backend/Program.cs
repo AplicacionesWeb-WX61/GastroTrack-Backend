@@ -25,39 +25,64 @@ using chefstock_platform.UserManagement.Interfaces.ACL;
 using chefstock_platform.UserManagement.Interfaces.ACL.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers(options => options.Conventions.Add(new KebabCaseRouteNamingConvention()));
 
-// Add CORS policy
+// CORS Configuration
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllPolicy",
-        policy => policy.AllowAnyOrigin()
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
             .AllowAnyMethod()
-            .AllowAnyHeader());
+            .AllowAnyHeader();
+    });
 });
 
-// Add Database Connection
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
 // Configure Database Context and Logging Levels
-builder.Services.AddDbContext<AppDbContext>(
-    options =>
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    if (builder.Environment.IsDevelopment())
     {
-        if (connectionString != null)
-            if (builder.Environment.IsDevelopment())
-                options.UseMySQL(connectionString)
-                    .LogTo(Console.WriteLine, LogLevel.Information)
-                    .EnableSensitiveDataLogging()
-                    .EnableDetailedErrors();
-            else if (builder.Environment.IsProduction())
-                options.UseMySQL(connectionString)
-                    .LogTo(Console.WriteLine, LogLevel.Error)
-                    .EnableDetailedErrors();
-    });
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        if(connectionString == null) throw new Exception("No connection string found");
+        options
+            .UseMySQL(connectionString)
+            .LogTo(Console.WriteLine, LogLevel.Information)
+            .EnableSensitiveDataLogging()
+            .EnableDetailedErrors();
+    }
+    else if (builder.Environment.IsProduction())
+    {
+        var connectionString = builder.Configuration.GetConnectionString("ProductionConnection");
+        if(connectionString == null) throw new Exception("No connection string found");
+        var GetFormatedString = ()=>{
+            string? host = DotNetEnv.Env.GetString("MYSQL_HOST") ?? Environment.GetEnvironmentVariable("MYSQL_HOST");
+            if(host == null) throw new Exception("No MYSQL_HOST found");
+            string? user = DotNetEnv.Env.GetString("MYSQL_USER") ?? Environment.GetEnvironmentVariable("MYSQL_USER");
+            if(user == null) throw new Exception("No MYSQL_USER found");
+            string? password = DotNetEnv.Env.GetString("MYSQL_PASSWORD") ?? Environment.GetEnvironmentVariable("MYSQL_PASSWORD");
+            if(password == null) throw new Exception("No MYSQL_PASSWORD found");
+            string? database = DotNetEnv.Env.GetString("MYSQL_DATABASE") ?? Environment.GetEnvironmentVariable("MYSQL_DATABASE");
+            if(database == null) throw new Exception("No MYSQL_DATABASE found");
+            string? port = DotNetEnv.Env.GetString("MYSQL_PORT") ?? Environment.GetEnvironmentVariable("MYSQL_PORT");
+            if(port == null) throw new Exception("No MYSQL_PORT found");
+
+            return String.Format(connectionString, host, user, password, database, port);
+        };
+        connectionString = GetFormatedString();
+        options
+            .UseMySQL(connectionString)
+            .LogTo(Console.WriteLine, LogLevel.Error)
+            .EnableDetailedErrors();
+    }
+});
+
 // Configure Lowercase URLs
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
@@ -159,7 +184,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Use CORS
-app.UseCors("AllowSpecificOrigin");
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
