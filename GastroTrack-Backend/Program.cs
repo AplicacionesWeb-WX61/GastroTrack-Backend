@@ -25,7 +25,9 @@ using chefstock_platform.UserManagement.Interfaces.ACL;
 using chefstock_platform.UserManagement.Interfaces.ACL.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-DotNetEnv.Env.Load();
+using DotNetEnv;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,43 +46,25 @@ builder.Services.AddCors(options =>
 });
 
 // Configure Database Context and Logging Levels
-
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    if (builder.Environment.IsDevelopment())
-    {
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-        if(connectionString == null) throw new Exception("No connection string found");
-        options
-            .UseMySQL(connectionString)
-            .LogTo(Console.WriteLine, LogLevel.Information)
-            .EnableSensitiveDataLogging()
-            .EnableDetailedErrors();
-    }
-    else if (builder.Environment.IsProduction())
-    {
-        var connectionString = builder.Configuration.GetConnectionString("ProductionConnection");
-        if(connectionString == null) throw new Exception("No connection string found");
-        var GetFormatedString = ()=>{
-            string? host = DotNetEnv.Env.GetString("MYSQL_HOST") ?? Environment.GetEnvironmentVariable("MYSQL_HOST");
-            if(host == null) throw new Exception("No MYSQL_HOST found");
-            string? user = DotNetEnv.Env.GetString("MYSQL_USER") ?? Environment.GetEnvironmentVariable("MYSQL_USER");
-            if(user == null) throw new Exception("No MYSQL_USER found");
-            string? password = DotNetEnv.Env.GetString("MYSQL_PASSWORD") ?? Environment.GetEnvironmentVariable("MYSQL_PASSWORD");
-            if(password == null) throw new Exception("No MYSQL_PASSWORD found");
-            string? database = DotNetEnv.Env.GetString("MYSQL_DATABASE") ?? Environment.GetEnvironmentVariable("MYSQL_DATABASE");
-            if(database == null) throw new Exception("No MYSQL_DATABASE found");
-            string? port = DotNetEnv.Env.GetString("MYSQL_PORT") ?? Environment.GetEnvironmentVariable("MYSQL_PORT");
-            if(port == null) throw new Exception("No MYSQL_PORT found");
+    var environment = builder.Environment.EnvironmentName;
 
-            return String.Format(connectionString, host, user, password, database, port);
-        };
-        connectionString = GetFormatedString();
-        options
-            .UseMySQL(connectionString)
-            .LogTo(Console.WriteLine, LogLevel.Error)
-            .EnableDetailedErrors();
-    }
+    var connectionString = environment switch
+    {
+        "Development" => builder.Configuration.GetConnectionString("DefaultConnection"),
+        "Production" => GetFormattedConnectionString(),
+        _ => throw new Exception("Unknown environment")
+    };
+
+    if (connectionString == null)
+        throw new Exception("No connection string found");
+
+    options
+        .UseMySQL(connectionString)
+        .LogTo(Console.WriteLine, LogLevel.Information)
+        .EnableSensitiveDataLogging()
+        .EnableDetailedErrors();
 });
 
 // Configure Lowercase URLs
@@ -140,33 +124,31 @@ builder.Services.AddScoped<ITransactionContextFacade, TransactionContextFacade>(
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(
-    c =>
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
     {
-        c.SwaggerDoc("v1",
-            new OpenApiInfo
-            {
-                Title = "GastroTrack_platform API",
-                Version = "v1",
-                Description = "GastroTrack Platform API",
-                TermsOfService = new Uri("https://github.com/FoodStockOS/ChefStock-Documentation"),
-                Contact = new OpenApiContact
-                {
-                    Name = "FoodStockOS",
-                    Email = "contact@chefstock.com"
-                },
-                License = new OpenApiLicense
-                {
-                    Name = "Apache 2.0",
-                    Url = new Uri("https://www.apache.org/licenses/LICENSE-2.0.html")
-                }
-            });
-        c.EnableAnnotations();
+        Title = "GastroTrack_platform API",
+        Version = "v1",
+        Description = "GastroTrack Platform API",
+        TermsOfService = new Uri("https://github.com/FoodStockOS/ChefStock-Documentation"),
+        Contact = new OpenApiContact
+        {
+            Name = "FoodStockOS",
+            Email = "contact@chefstock.com"
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Apache 2.0",
+            Url = new Uri("https://www.apache.org/licenses/LICENSE-2.0.html")
+        }
     });
+    c.EnableAnnotations();
+});
 
 var app = builder.Build();
 
-// Verify Database Objects area Created
+// Verify Database Objects are Created
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -191,3 +173,22 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Helper method to format the connection string for production
+string GetFormattedConnectionString()
+{
+    var connectionStringTemplate = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (connectionStringTemplate == null)
+        throw new Exception("No connection string template found");
+
+    string? host = Env.GetString("MYSQL_HOST");
+    string? user = Env.GetString("MYSQL_USER");
+    string? password = Env.GetString("MYSQL_PASSWORD");
+    string? database = Env.GetString("MYSQL_DATABASE");
+    string? port = Env.GetString("MYSQL_PORT");
+
+    if (host == null || user == null || password == null || database == null || port == null)
+        throw new Exception("Environment variables for MySQL are missing");
+
+    return string.Format(connectionStringTemplate, host, port, user, password, database);
+}
