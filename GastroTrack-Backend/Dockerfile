@@ -1,14 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /App
 
-env MYSQL_HOST=
-env MYSQL_PORT=
-env MYSQL_USER=
-env MYSQL_PASSWORD=
-env MYSQL_DATABASE=
-
 # Copy everything
-COPY . ./
+COPY . ./ 
 # Restore as distinct layers
 RUN dotnet restore
 # Build and publish a release
@@ -18,5 +12,5 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /App
 COPY --from=build-env /App/out .
-# Comando para ejecutar la aplicación
+EXPOSE 8080
 CMD ["dotnet", "GastroTrack-Backend.dll"]
