@@ -92,6 +92,14 @@ builder.Services.AddScoped<IMembrersCommandService, MembrersCommandService>();
 builder.Services.AddScoped<IMembrersQueryService, MembrersQueryService>();
 builder.Services.AddScoped<IMembrersRepository, MembrersRepository>();
 builder.Services.AddScoped<IMembersContextFacade, MembersContextFacade>();
+
+// User Dependency Injection
+builder.Services.AddScoped<ITaskCommandService, TaskCommandService>();
+builder.Services.AddScoped<ITaskQueryService, TaskQueryService>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<ITaskContextFacade, TaskContextFacade>();
+
+
 // User Dependency Injection
 builder.Services.AddScoped<IUserCommandService, UserCommandService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
@@ -109,6 +117,19 @@ builder.Services.AddScoped<IRoleCommandService, RoleCommandService>();
 builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IRoleContextFacade, RoleContextFacade>();
+
+// Notification Dependency Injection
+builder.Services.AddScoped<INotificationCommandService, NotificationCommandService>();
+builder.Services.AddScoped<INotificationQueryService, NotificationQueryService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationContextFacade, NotificationContextFacade>();
+
+// Report Dependency Injection
+builder.Services.AddScoped<IReportCommandService, ReportCommandService>();
+builder.Services.AddScoped<IReportQueryService, ReportQueryService>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IReportContextFacade, ReportContextFacade>();
+
 
 // Transaction Dependency Injection
 builder.Services.AddScoped<ITransactionCommandService, TransactionCommandService>();
