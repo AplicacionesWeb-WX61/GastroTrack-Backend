@@ -1,4 +1,5 @@
-﻿using chefstock_platform.UserManagement.Domain.Model.Commands;
+﻿using chefstock_platform.RestaurantManagement.Domain.Model.Entities;
+using chefstock_platform.UserManagement.Domain.Model.Commands;
 
 namespace chefstock_platform.UserManagement.Domain.Model.Aggregates;
 
@@ -22,5 +23,5 @@ public class Role
     public string? RoleName { get; set; }
 
     // Navigation property
-    public ICollection<User>? Users { get; set; }
+    public ICollection<Membrers> Membrers { get; set; }
 }

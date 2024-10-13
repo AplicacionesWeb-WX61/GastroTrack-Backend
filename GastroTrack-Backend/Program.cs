@@ -88,16 +88,10 @@ builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<ISupplierContextFacade, SupplierContextFacade>();
 
 // Restaurant and Employee Dependency Injection
-builder.Services.AddScoped<IRestaurantCommandService, RestaurantCommandService>();
-builder.Services.AddScoped<IRestaurantQueryService, RestaurantQueryService>();
-builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
-builder.Services.AddScoped<IRestaurantContextFacade, RestaurantContextFacade>();
-
-builder.Services.AddScoped<IEmployeeCommandService, EmployeeCommandService>();
-builder.Services.AddScoped<IEmployeeQueryService, EmployeeQueryService>();
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IEmployeeContextFacade, EmployeeContextFacade>();
-
+builder.Services.AddScoped<IMembrersCommandService, MembrersCommandService>();
+builder.Services.AddScoped<IMembrersQueryService, MembrersQueryService>();
+builder.Services.AddScoped<IMembrersRepository, MembrersRepository>();
+builder.Services.AddScoped<IMembersContextFacade, MembersContextFacade>();
 // User Dependency Injection
 builder.Services.AddScoped<IUserCommandService, UserCommandService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();

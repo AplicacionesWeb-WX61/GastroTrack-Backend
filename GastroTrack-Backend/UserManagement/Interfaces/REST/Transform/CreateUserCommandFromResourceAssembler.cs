@@ -7,6 +7,6 @@ public class CreateUserCommandFromResourceAssembler
 {
     public static CreateUserCommand ToCommandFromResource(CreateUserResource resource)
     {
-        return new CreateUserCommand(resource.FirstName, resource.LastName, resource.Email, resource.Password, resource.Phone, resource.Address, resource.RoleId);
+        return new CreateUserCommand(resource.FirstName, resource.LastName, resource.Email, resource.Password, resource.Company);
     }
 }

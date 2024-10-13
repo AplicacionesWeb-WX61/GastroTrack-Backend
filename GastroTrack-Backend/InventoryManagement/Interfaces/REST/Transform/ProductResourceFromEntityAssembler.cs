@@ -7,6 +7,7 @@ public static class ProductResourceFromEntityAssembler
 {
     public static ProductResource ToResourceFromEntity(Product entity)
     {
-        return new ProductResource(entity.ProductId, entity.Name, entity.Stock, entity.Image, entity.Description, entity.DueDate, (int)entity.CategoryId);
+        return new ProductResource(entity.ProductId, entity.Name, (int)entity.CategoryId, entity.DateManufacture,
+            entity.DueDate, entity.Stock, entity.State, entity.Image);
     }
 }

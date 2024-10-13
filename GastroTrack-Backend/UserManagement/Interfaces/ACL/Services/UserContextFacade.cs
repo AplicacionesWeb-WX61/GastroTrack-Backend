@@ -3,7 +3,6 @@ using chefstock_platform.UserManagement.Domain.Model.Commands;
 using chefstock_platform.UserManagement.Domain.Model.Queries;
 using chefstock_platform.UserManagement.Domain.Services;
 
-using chefstock_platform.UserManagement.Domain.Model.ValueObjects;
 
 namespace chefstock_platform.UserManagement.Interfaces.ACL.Services
 {
@@ -11,9 +10,9 @@ namespace chefstock_platform.UserManagement.Interfaces.ACL.Services
         : IUserContextFacade
     {
 
-        public async Task<int> CreateUser(string firstName, string lastName, Email email, string password, string phone, string address, int roleId)
+        public async Task<int> CreateUser(string firstName, string lastName, string email, string password, string company)
         {
-            var createUserCommand = new CreateUserCommand(firstName, lastName, email, phone, address, phone,roleId);
+            var createUserCommand = new CreateUserCommand(firstName, lastName, email, password, company);
             var user = await userCommandService.Handle(createUserCommand);
             return user?.UserId ?? 0;
         }
@@ -30,9 +29,9 @@ namespace chefstock_platform.UserManagement.Interfaces.ACL.Services
             return await userQueryService.Handle(getAllUsersQuery);
         }
 
-        public async Task UpdateUser(int id, string firstName, string lastName, Email email, string password, string phone, string address, int roleId)
+        public async Task UpdateUser(int id, string firstName, string lastName, string email, string password, string company)
         {
-            var updateUserCommand = new UpdateUserCommand(id, firstName, lastName, email, phone, address, phone,roleId);
+            var updateUserCommand = new UpdateUserCommand(id, firstName, lastName, email, password, company);
             await userCommandService.Handle(updateUserCommand);
         }
 

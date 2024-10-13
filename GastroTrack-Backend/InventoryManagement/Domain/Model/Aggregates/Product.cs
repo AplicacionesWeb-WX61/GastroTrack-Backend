@@ -12,15 +12,16 @@ public class Product
     
     [MaxLength(50)]
     public string? Name { get; set; }
-
-    [MaxLength(200)]
-    public string? Description { get; set; }
-    public int Stock { get; set; }
     
     public ECategory CategoryId { get; set; }
-    public string? Image { get; set; }
-    public DateTime DueDate { get; set; }
     
+    public string? DateManufacture { get; set; }
+    
+    public string? DueDate { get; set; }
+    public int Stock { get; set; }
+    
+    public string? State { get; set; }
+    public string? Image { get; set; }
     public ICollection<Inventory>? Inventories { get; set; }
     
     
@@ -34,33 +35,40 @@ public class Product
     {
 
     }
-    public Product(int productId, string name, string description, int stock, string image, DateTime dueDate)
+    public Product(int productId, string name, ECategory categoryId, string? dateManufacture, string? dueDate, int stock, string? state, string? image)
     {
         ProductId = productId;
         Name = name;
-        Description = description;
-        Stock = stock;
-        Image = image;
+        CategoryId = categoryId;
+        DateManufacture = dateManufacture;
         DueDate = dueDate;
-        
+        Stock = stock;
+        State = state;
+        Image = image;
     }
+
+    
     public Product(CreateProductCommand command)
     {
         Name = command.Name;
-        Description = command.Description;
+        CategoryId = (ECategory)command.CategoryId; 
+        DateManufacture = command.DateManufacture; 
+        DueDate = command.DueDate; 
         Stock = command.Stock;
-        Image = command.Image;
-        DueDate = command.DueDate;
-        CategoryId = (ECategory)command.CategoryId;
+        State = command.State; 
+        Image = command.Image; 
     }
+
+    // Método para actualizar el producto
     public void Update(UpdateProductCommand command)
     {
         ProductId = command.ProductId;
         Name = command.Name;
-        Description = command.Description;
+        CategoryId = (ECategory)command.CategoryId; 
+        DateManufacture = command.DateManufacture; 
+        DueDate = command.DueDate; 
         Stock = command.Stock;
-        Image = command.Image;
-        DueDate = command.DueDate;
-        CategoryId = (ECategory)command.CategoryId;
+        State = command.State; 
+        Image = command.Image; 
     }
 }

@@ -7,6 +7,6 @@ public static class SupplierResourceFromEntityAssembler
 {
     public static SupplierResource ToResourceFromEntity(Supplier entity)
     {
-        return new SupplierResource(entity.SupplierId, entity.SupplierName, entity.ContactName, entity.ContactEmail, entity.Phone, entity.Address);
+        return new SupplierResource(entity.SupplierId, entity.SupplierName, entity.RestaunrantName, entity.ContactEmail, entity.Phone, entity.SupplierPhoto);
     }
 }

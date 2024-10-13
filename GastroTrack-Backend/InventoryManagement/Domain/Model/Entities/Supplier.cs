@@ -14,20 +14,20 @@ public class Supplier
     public Supplier(CreateSupplierCommand command)
     {
         SupplierName = command.SupplierName;
-        ContactName = command.ContactName;
+        RestaunrantName = command.RestaunrantName;
         ContactEmail = command.ContactEmail;
         Phone = command.Phone;
-        Address = command.Address;
+        SupplierPhoto = command.SupplierPhoto ;
     }
 
     public void Update(UpdateSupplierCommand command)
     {
         SupplierId = command.SupplierId;
         SupplierName = command.SupplierName;
-        ContactName = command.ContactName;
+        RestaunrantName = command.RestaunrantName;
         ContactEmail = command.ContactEmail;
         Phone = command.Phone;
-        Address = command.Address;
+        SupplierPhoto = command.SupplierPhoto ;
     }
     public int SupplierId { get; set; }
 
@@ -35,7 +35,7 @@ public class Supplier
     public string? SupplierName { get; set; }
 
     [MaxLength(50)]
-    public string? ContactName { get; set; }
+    public string? RestaunrantName { get; set; }
 
     [MaxLength(100)]
     public string? ContactEmail { get; set; }
@@ -44,7 +44,8 @@ public class Supplier
     public string? Phone { get; set; }
 
     [MaxLength(100)]
-    public string? Address { get; set; }
-
+    public string? SupplierPhoto { get; set; }
+    
+    
     //public ICollection<Product?>? Products { get; set; }
 }

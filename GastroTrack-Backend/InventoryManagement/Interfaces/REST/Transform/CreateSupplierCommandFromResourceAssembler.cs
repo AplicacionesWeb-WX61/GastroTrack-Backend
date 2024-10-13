@@ -7,6 +7,6 @@ public static class CreateSupplierCommandFromResourceAssembler
 {
     public static CreateSupplierCommand ToCommandFromResource(CreateSupplierResource resource)
     {
-        return new CreateSupplierCommand(resource.SupplierName, resource.ContactName, resource.ContactEmail, resource.Phone, resource.Address);
+        return new CreateSupplierCommand(resource.SupplierName, resource.RestaunrantName, resource.ContactEmail, resource.Phone, resource.SupplierName);
     }
 }

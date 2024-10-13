@@ -13,9 +13,9 @@ public class SupplierContextFacade(
     ISupplierQueryService supplierQueryService)
     : ISupplierContextFacade
 {
-    public async Task<int> CreateSupplier(string supplierName, string contactName, string contactEmail, string phone, string address)
+    public async Task<int> CreateSupplier(string supplierName, string restaunrantName, string contactEmail, string phone, string supplierPhoto)
     {
-        var createSupplierCommand = new CreateSupplierCommand(supplierName, contactName, contactEmail, phone, address);
+        var createSupplierCommand = new CreateSupplierCommand(supplierName, restaunrantName, contactEmail, phone, supplierPhoto);
         var supplier = await supplierCommandService.Handle(createSupplierCommand);
         return supplier?.SupplierId ?? 0;
     }
@@ -32,9 +32,9 @@ public class SupplierContextFacade(
         return await supplierQueryService.Handle(getAllSuppliersQuery);
     }
 
-    public async Task UpdateSupplier(int id, string supplierName, string contactName, string contactEmail, string phone, string address)
+    public async Task UpdateSupplier(int id, string supplierName, string restaunrantName, string contactEmail, string phone, string supplierPhoto)
     {
-        var updateSupplierCommand = new UpdateSupplierCommand(id, supplierName, contactName, contactEmail, phone, address);
+        var updateSupplierCommand = new UpdateSupplierCommand(id, supplierName, restaunrantName, contactEmail, phone, supplierPhoto);
         await supplierCommandService.Handle(updateSupplierCommand);
     }
 

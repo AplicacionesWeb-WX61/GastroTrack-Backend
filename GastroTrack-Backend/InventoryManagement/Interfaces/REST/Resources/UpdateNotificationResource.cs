@@ -1,0 +1,3 @@
+﻿namespace chefstock_platform.InventoryManagement.Interfaces.REST.Resources;
+
+public record UpdateNotificationResource(int NotificationId,string NotificationName,string NotificationDescription);

@@ -1,6 +1,5 @@
 ﻿using chefstock_platform.InventoryManagement.Domain.Model.Aggregates;
 using chefstock_platform.InventoryManagement.Domain.Model.Entities;
-using chefstock_platform.RestaurantManagement.Domain.Model.Aggregates;
 using chefstock_platform.RestaurantManagement.Domain.Model.Entities;
 using chefstock_platform.Shared.Infrastructure.Persistence.EFC.Configuration.Extensions;
 using chefstock_platform.UserManagement.Domain.Model.Aggregates;
@@ -10,97 +9,133 @@ using Microsoft.EntityFrameworkCore;
 
 namespace chefstock_platform.Shared.Infrastructure.Persistence.EFC.Configuration;
 
-public class AppDbContext(DbContextOptions options) : DbContext(options)
+public class AppDbContext : DbContext
 {
-    protected override void OnConfiguring(DbContextOptionsBuilder builder)
-    {
-        base.OnConfiguring(builder);
-        // Enable Audit Fields Interceptors
-        builder.AddCreatedUpdatedInterceptor();
-    }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        base.OnModelCreating(builder);
-        builder.Entity<User>().OwnsOne(u => u.Email);
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        {
+            base.OnConfiguring(builder);
+            // Enable Audit Fields Interceptors
+            builder.AddCreatedUpdatedInterceptor();
+        }
 
-        // Product Context
-        builder.Entity<Product>().HasKey(p => p.ProductId);
-        builder.Entity<Product>().Property(p => p.ProductId).IsRequired().ValueGeneratedOnAdd();
-        
-        // Role Context
-        builder.Entity<Role>().HasKey(r => r.RoleId);
-        builder.Entity<Role>().Property(r => r.RoleId).IsRequired().ValueGeneratedOnAdd();
-        
-        // User Context
-        builder.Entity<User>().HasKey(u => u.UserId);
-        builder.Entity<User>().Property(u => u.UserId).IsRequired().ValueGeneratedOnAdd();
-        
-        // Transaction Context
-        builder.Entity<Transaction>().HasKey(t => t.TransactionId);
-        builder.Entity<Transaction>().Property(t => t.TransactionId).IsRequired().ValueGeneratedOnAdd();
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
 
-        // Inventory Context
-        builder.Entity<Inventory>().HasKey(i => i.InventoryId); 
-        builder.Entity<Inventory>().Property(i => i.InventoryId).IsRequired().ValueGeneratedOnAdd();
-        
-        // Supplier Context
-        builder.Entity<Supplier>().HasKey(s => s.SupplierId); 
-        builder.Entity<Supplier>().Property(s => s.SupplierId).IsRequired().ValueGeneratedOnAdd();
-        
-        // Employee Context
-        builder.Entity<Employee>().HasKey(e => e.EmployeeId); 
-        builder.Entity<Employee>().Property(e => e.EmployeeId).IsRequired().ValueGeneratedOnAdd();
+            // Configuración de la entidad User
+            builder.Entity<User>(user =>
+            {
+                user.HasKey(u => u.UserId);
+                user.Property(u => u.UserId).IsRequired().ValueGeneratedOnAdd();
+                user.Property(u => u.Email).IsRequired();
+                user.Property(u => u.Password).IsRequired();
+                user.Property(u => u.Company).IsRequired(false);
+                user.Property(u => u.FirstName).IsRequired();
+                user.Property(u => u.LastName).IsRequired();
+            });
+            
+            // Configuración de la entidad Tasks
+            builder.Entity<Tasks>(tasks =>
+            {
+                tasks.HasKey(t => t.TaskId);
+                tasks.Property(t => t.TaskId).IsRequired().ValueGeneratedOnAdd();
+                tasks.Property(t => t.TaskName).IsRequired();
+                tasks.Property(t => t.TaskDescription).IsRequired();
+                tasks.Property(t => t.TaskDate).IsRequired();
+            });
+            
 
-        // Profile Context
-        builder.Entity<Profile>().HasKey(p => p.ProfileId); 
-        builder.Entity<Profile>().Property(p => p.ProfileId).IsRequired().ValueGeneratedOnAdd();
+            // Configuración de la entidad Product
+            builder.Entity<Product>(product =>
+            {
+                product.HasKey(p => p.ProductId);
+                product.Property(p => p.ProductId).IsRequired().ValueGeneratedOnAdd();
+                product.Property(p => p.CategoryId).HasConversion<int>(); // Conversión de CategoryId
+            });
 
-        // Restaurant Context
-        builder.Entity<Restaurant>().HasKey(r => r.RestaurantId); 
-        builder.Entity<Restaurant>().Property(r => r.RestaurantId).IsRequired().ValueGeneratedOnAdd();
-        
-        /*
-        // Category and Supplier Relationships
-        builder.Entity<Product>()
-            .HasMany(p => p.Categories)
-            .WithOne()
-            .HasForeignKey(c => c.CategoryId);
+            // Configuración de la entidad Role
+            builder.Entity<Role>(role =>
+            {
+                role.HasKey(r => r.RoleId);  // Clave primaria
+                role.Property(r => r.RoleId).IsRequired().ValueGeneratedOnAdd();
+                role.Property(r => r.RoleName).IsRequired();  // Nombre del rol
+            });
 
-        builder.Entity<Product>()
-            .HasMany(p => p.Suppliers)
-            .WithOne()
-            .HasForeignKey(s => s.SupplierId);
-        */
-        builder.Entity<Product>()
-            .Property(p => p.CategoryId)
-            .HasConversion<int>();
-        
-        // Product Relationships
-        builder.Entity<Inventory>()
-            .HasOne(i => i.Product)
-            .WithMany(p => p.Inventories)
-            .HasForeignKey(i => i.ProductId);
-        
-        // User and Role Relationships
-        builder.Entity<User>()
-            .HasOne(u => u.Role)
-            .WithMany(r => r.Users)
-            .HasForeignKey(u => u.RoleId);
+            // Configuración de la entidad Transaction
+            builder.Entity<Transaction>(transaction =>
+            {
+                transaction.HasKey(t => t.TransactionId);
+                transaction.Property(t => t.TransactionId).IsRequired().ValueGeneratedOnAdd();
+                transaction.HasOne(t => t.User).WithMany().HasForeignKey(t => t.UserId);
+                transaction.HasOne(t => t.Product).WithMany(p => p.Transactions).HasForeignKey(t => t.ProductId);
+            });
 
-// Transaction Relationships
-        builder.Entity<Transaction>()
-            .HasOne(t => t.User)
-            .WithMany(u => u.Transactions)
-            .HasForeignKey(t => t.UserId);
-        
-        // Product and Transaction Relationships
-        builder.Entity<Transaction>()
-            .HasOne(t => t.Product)
-            .WithMany(p => p.Transactions)
-            .HasForeignKey(t => t.ProductId);
-        
-        // Apply SnakeCase Naming Convention
-        builder.UseSnakeCaseWithPluralizedTableNamingConvention();
-    }
+            // Configuración de la entidad Inventory
+            builder.Entity<Inventory>(inventory =>
+            {
+                inventory.HasKey(i => i.InventoryId);
+                inventory.Property(i => i.InventoryId).IsRequired().ValueGeneratedOnAdd();
+                inventory.HasOne(i => i.Product).WithMany(p => p.Inventories).HasForeignKey(i => i.ProductId);
+            });
+
+            // Configuración de la entidad Supplier
+            builder.Entity<Supplier>(supplier =>
+            {
+                supplier.HasKey(s => s.SupplierId);
+                supplier.Property(s => s.SupplierId).IsRequired().ValueGeneratedOnAdd();
+                supplier.Property(s => s.RestaunrantName).IsRequired().ValueGeneratedOnAdd();
+                supplier.Property(s => s.ContactEmail).IsRequired().ValueGeneratedOnAdd();
+                supplier.Property(s => s.Phone).IsRequired().ValueGeneratedOnAdd();
+                supplier.Property(s => s.SupplierPhoto).IsRequired().ValueGeneratedOnAdd();
+            });
+
+            // Configuración de la entidad Membrers
+            builder.Entity<Membrers>(members =>
+            {
+                members.HasKey(m => m.MembersId);
+                members.Property(m => m.MembersId).IsRequired().ValueGeneratedOnAdd();
+                members.Property(m => m.MemberName).IsRequired();
+                members.Property(m => m.Description).IsRequired(false);
+                members.Property(m => m.Photo).IsRequired(false);  // Foto del miembro
+
+                // Relación con Role
+                members.HasOne(m => m.Role)
+                       .WithMany(r => r.Membrers)
+                       .HasForeignKey(m => m.RoleId);  // Foreign key hacia Role
+            });
+
+            // Configuración de la entidad Profile
+            builder.Entity<Profile>(profile =>
+            {
+                profile.HasKey(p => p.ProfileId);
+                profile.Property(p => p.ProfileId).IsRequired().ValueGeneratedOnAdd();
+            });
+            
+            
+            // Configuración de la entidad Notificaiones
+            builder.Entity<Notification>(notification =>
+            {
+                notification.HasKey(n => n.NotificationId);
+                notification.Property(n => n.NotificationId).IsRequired().ValueGeneratedOnAdd();
+                notification.Property(n => n.NotificationName).IsRequired();
+                notification.Property(n => n.NotificationDescription).IsRequired();
+            });
+            
+            // Configuración de la entidad Report
+            builder.Entity<Report>(report =>
+            {
+                report.HasKey(r => r.ReportId);
+                report.Property(r => r.ReportId).IsRequired().ValueGeneratedOnAdd();
+                report.Property(r => r.ReportName).IsRequired();
+                report.Property(r => r.ReportDescription).IsRequired();
+                report.Property(r => r.ReportDate).IsRequired();
+            });
+
+            
+
+            // Aplicar convención SnakeCase para los nombres de tablas
+            builder.UseSnakeCaseWithPluralizedTableNamingConvention();
+        }
 }
